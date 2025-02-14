@@ -9,6 +9,7 @@
   "dependencies": {
     "@mantine/core": "^7.16.3",
     "@mantine/hooks": "^7.16.3",
+    "@tabler/icons-react": "^3.30.0",
     "preact": "^10.25.3",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat"
