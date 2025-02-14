@@ -3,7 +3,6 @@ import { render } from "preact";
 import "@mantine/core/styles.css";
 import {
   Box,
-  Button,
   Center,
   DEFAULT_THEME,
   Divider,
@@ -15,6 +14,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { Editor } from "./editor";
 
 const theme = mergeMantineTheme(DEFAULT_THEME, {
   primaryColor: "red",
@@ -65,9 +65,7 @@ export function App() {
               first node on new map and re-upload your save!
             </Text>
           </Box>
-          <Button variant="light" onClick={() => alert("Too fast. Too soon.")}>
-            Upload save file
-          </Button>
+          <Editor />
         </Stack>
       </Center>
     </MantineProvider>
