@@ -81,22 +81,32 @@ export function saveSave(save: any): string {
 
 let nodeCounter = 0;
 
-function crawlNode(node: any) {
+function crawlNode(node: any, callback?: (node: any) => void) {
   if (typeof node == "string" || !node) return;
   if (node.connectedNodes) {
-    node.$type = "1337|DiskCardGame.BossBattleNodeData, Assembly-CSharp";
-    node.difficulty = 15;
-    let [id, type] = [
-      ["ProspectorBattleSequencer", 3],
-      ["AnglerBattleSequencer", 4],
-      ["TrapperTraderBattleSequencer", 6],
-    ][Math.floor(Math.random() * 3)];
-    node.specialBattleId = id;
-    node.bossType = type;
-    node.blueprint = null;
+    if (callback) callback(node);
     nodeCounter++;
-    node.connectedNodes.$rcontent.forEach(crawlNode);
+    node.connectedNodes.$rcontent.forEach((_node) =>
+      crawlNode(_node, callback)
+    );
   }
+}
+
+function editNodes(nodes: any[]) {
+  nodes.forEach((rootNode) =>
+    crawlNode(rootNode, (node) => {
+      node.$type = "1337|DiskCardGame.BossBattleNodeData, Assembly-CSharp";
+      node.difficulty = 15;
+      let [id, type] = [
+        ["ProspectorBattleSequencer", 3],
+        ["AnglerBattleSequencer", 4],
+        ["TrapperTraderBattleSequencer", 6],
+      ][Math.floor(Math.random() * 3)];
+      node.specialBattleId = id;
+      node.bossType = type;
+      node.blueprint = null;
+    })
+  );
 }
 
 export function editSave(save: any): [boolean, string] {
@@ -116,7 +126,7 @@ export function editSave(save: any): [boolean, string] {
   )
     return [false, "Failed to get node data! Are you sure save isn't corrupt?"];
   nodeCounter = 0;
-  save.ascensionData.currentRun.map.nodeData.$rcontent.forEach(crawlNode);
+  editNodes(save.ascensionData.currentRun.map.nodeData.$rcontent);
   if (nodeCounter == 0)
     return [false, "No node data found! Are you sure save isn't corrupt?"];
   return [true, `${nodeCounter} nodes edited`];
