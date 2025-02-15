@@ -9,7 +9,6 @@ export function Editor() {
   let [status, setStatus] = useState<string>();
   let [save, setSave] = useState<any>();
   let resetRef = useRef<() => void>();
-  if (error) console.error(error);
   return (
     <>
       <FileButton
@@ -18,7 +17,17 @@ export function Editor() {
         onChange={async (_file) => {
           resetRef.current?.();
           try {
-            let _save = loadSave(new Uint8Array(await _file.arrayBuffer()));
+            let bytes = new Uint8Array(await _file.arrayBuffer());
+            let _save;
+            try {
+              _save = loadSave(bytes);
+            } catch {
+              // Pretty much any error from loadSave can only be caused by giving it data it does not expect.
+              // So this message is more helpful for users than something like JSON parse error.
+              return setError(
+                `Failed to load save file! Are you sure ${_file.name} is correct file and it is not corrupt?`
+              );
+            }
             let [ok, message] = editSave(_save);
             if (!ok) return setError(message);
             setStatus(message);
@@ -26,6 +35,7 @@ export function Editor() {
             setSave(_save);
             setError(null);
           } catch (e) {
+            console.error(e);
             setError(e);
           }
         }}
@@ -85,6 +95,7 @@ export function Editor() {
                 link.href = URL.createObjectURL(new Blob([saveSave(save)]));
                 link.click();
               } catch (e) {
+                console.error(e);
                 setError(e);
               }
             }}
