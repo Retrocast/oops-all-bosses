@@ -1,7 +1,7 @@
 import { Anchor, Button, FileButton, Text, Textarea } from "@mantine/core";
 import { IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRef, useState } from "preact/hooks";
-import { loadSave, editSave, saveSave } from "./savefile";
+import { loadSave, editSave, saveSave, checkSave } from "./savefile";
 
 export function Editor() {
   let [file, setFile] = useState<File>();
@@ -28,7 +28,7 @@ export function Editor() {
                 `Failed to load save file! Are you sure ${_file.name} is correct file and it is not corrupt?`
               );
             }
-            let [ok, message] = editSave(_save);
+            let [ok, message] = checkSave(_save);
             if (!ok) return setError(message);
             setStatus(message);
             setFile(_file);
@@ -92,6 +92,7 @@ export function Editor() {
               let link = document.createElement("a");
               link.download = "SaveFile.gwsave";
               try {
+                editSave(save);
                 link.href = URL.createObjectURL(new Blob([saveSave(save)]));
                 link.click();
               } catch (e) {

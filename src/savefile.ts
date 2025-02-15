@@ -109,7 +109,15 @@ function editNodes(nodes: any[]) {
   );
 }
 
-export function editSave(save: any): [boolean, string] {
+const REGIONS = [
+  "The Woodlands",
+  "The Wetlands",
+  "The Snow Line",
+  "Finale",
+  "???",
+];
+
+export function checkSave(save: any): [boolean, string] {
   if (!save.ascensionData || !save.ascensionData.currentRun)
     return [
       false,
@@ -126,8 +134,21 @@ export function editSave(save: any): [boolean, string] {
   )
     return [false, "Failed to get node data! Are you sure save isn't corrupt?"];
   nodeCounter = 0;
-  editNodes(save.ascensionData.currentRun.map.nodeData.$rcontent);
+  save.ascensionData.currentRun.map.nodeData.$rcontent.forEach(crawlNode);
   if (nodeCounter == 0)
     return [false, "No node data found! Are you sure save isn't corrupt?"];
-  return [true, `${nodeCounter} nodes edited`];
+  return [
+    true,
+    REGIONS[
+      save.ascensionData.currentRun.regionOrder.$pcontent[
+        save.ascensionData.currentRun.regionTier
+      ] ?? 4
+    ],
+  ];
+}
+
+export function editSave(save: any): number {
+  nodeCounter = 0;
+  editNodes(save.ascensionData.currentRun.map.nodeData.$rcontent);
+  return nodeCounter;
 }
