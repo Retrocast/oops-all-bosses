@@ -1,13 +1,35 @@
 import { Anchor, Button, FileButton, Text, Textarea } from "@mantine/core";
 import { IconDownload, IconUpload } from "@tabler/icons-react";
-import { useState } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
+import { loadSave, editSave, saveSave } from "./savefile";
 
 export function Editor() {
   let [file, setFile] = useState<File>();
   let [error, setError] = useState<string | Error>();
+  let [status, setStatus] = useState<string>();
+  let [save, setSave] = useState<any>();
+  let resetRef = useRef<() => void>();
+  if (error) console.error(error);
   return (
     <>
-      <FileButton accept=".gwsave" onChange={setFile}>
+      <FileButton
+        accept=".gwsave"
+        resetRef={resetRef}
+        onChange={async (_file) => {
+          resetRef.current?.();
+          try {
+            let _save = loadSave(new Uint8Array(await _file.arrayBuffer()));
+            let [ok, message] = editSave(_save);
+            if (!ok) return setError(message);
+            setStatus(message);
+            setFile(_file);
+            setSave(_save);
+            setError(null);
+          } catch (e) {
+            setError(e);
+          }
+        }}
+      >
         {(props) => (
           <Button
             leftSection={<IconUpload size={14} />}
@@ -51,7 +73,7 @@ export function Editor() {
       {file && (
         <>
           <Text>
-            {file.name} - {file.size} bytes (Unchanged)
+            {file.name} - {file.size} bytes ({status})
           </Text>
           <Button
             rightSection={<IconDownload size={14} />}
@@ -59,11 +81,12 @@ export function Editor() {
             onClick={async () => {
               let link = document.createElement("a");
               link.download = "SaveFile.gwsave";
-              link.href = URL.createObjectURL(
-                new Blob([await file.arrayBuffer()])
-              );
-              setError(new Error("Not implemented"));
-              link.click();
+              try {
+                link.href = URL.createObjectURL(new Blob([saveSave(save)]));
+                link.click();
+              } catch (e) {
+                setError(e);
+              }
             }}
           >
             Download save file
