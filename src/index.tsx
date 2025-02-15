@@ -26,7 +26,7 @@ const theme = mergeMantineTheme(DEFAULT_THEME, {
 export function App() {
   return (
     <MantineProvider forceColorScheme="dark" theme={theme}>
-      <Center h="100vh" w="100vw" style={{ backgroundColor: "black" }}>
+      <Center h="100vh" w="100vw" style={{ backgroundColor: "black" }} p="10px">
         <Stack align="center">
           <Group>
             <Image src="/icon.png" />
@@ -38,8 +38,8 @@ export function App() {
           <Box maw="750px">
             <Text>
               Are you brave enough to try the challenge that turns every map
-              node into a boss battle? It is almost as hard as Skull Storm,
-              according to commenters' reactions.{" "}
+              node into a boss battle? According to commenters' reactions, it's
+              almost as hard as Skull Storm!{" "}
               <Text span c="red.7" fw={700}>
                 No mods required!
               </Text>
