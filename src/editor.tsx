@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRef, useState } from "preact/hooks";
-import { loadSave, editSave, saveSave, checkSave } from "./savefile";
+import { loadSave, editSave, saveSave, checkSave, BOONS } from "./savefile";
 
 export function Editor() {
   let [error, setError] = useState<string | Error>();
@@ -21,6 +21,7 @@ export function Editor() {
     "The Trapper",
   ]);
   let [iconsLie, setIconsLie] = useState(false);
+  let [boons, setBoons] = useState([]);
   let resetRef = useRef<() => void>();
   return (
     <>
@@ -53,6 +54,18 @@ export function Editor() {
             );
             setSave(_save);
             setError(null);
+            if (
+              _save.ascensionData.currentRun?.playerDeck?.boonIds?.$rcontent
+                ?.length
+            ) {
+              setBoons(
+                _save.ascensionData.currentRun.playerDeck.boonIds.$rcontent.map(
+                  (boon) => BOONS[boon]
+                )
+              );
+            } else {
+              setBoons([]);
+            }
           } catch (e) {
             console.error(e);
             setError(e);
@@ -117,6 +130,22 @@ export function Editor() {
             checked={iconsLie}
             onChange={(e) => setIconsLie(e.currentTarget.checked)}
           />
+          <MultiSelect
+            variant="unstyled"
+            label="Boons"
+            description="There's no way you're beating it without boons"
+            placeholder={boons.length > 0 ? null : "No boons at all?"}
+            value={boons}
+            onChange={setBoons}
+            data={[
+              "Ambidextrous",
+              "Magpie's Eye",
+              "Starting Goat",
+              "Starting Trees",
+              "+8 bones",
+              "+1 bones",
+            ]}
+          />
           <Button
             rightSection={<IconDownload size={14} />}
             variant="light"
@@ -124,7 +153,7 @@ export function Editor() {
               let link = document.createElement("a");
               link.download = "SaveFile.gwsave";
               try {
-                editSave(save, bosses, iconsLie);
+                editSave(save, bosses, iconsLie, boons);
                 link.href = URL.createObjectURL(new Blob([saveSave(save)]));
                 link.click();
               } catch (e) {

@@ -101,6 +101,17 @@ const BOSSES = {
   "The Trapper": ["TrapperTraderBattleSequencer", 6],
 };
 
+export const BOONS = [
+  "None",
+  "Ambidextrous",
+  "Magpie's Eye",
+  "Rabid Squirrel",
+  "Starting Goat",
+  "Starting Trees",
+  "+8 bones",
+  "+1 bones",
+];
+
 function editNodes(nodes: any[], bosses: string[], iconsLie: boolean) {
   nodes.forEach((rootNode) =>
     crawlNode(rootNode, (node) => {
@@ -157,7 +168,8 @@ export function checkSave(save: any): [boolean, string] {
 export function editSave(
   save: any,
   bosses: string[],
-  iconsLie: boolean
+  iconsLie: boolean,
+  boons: string[]
 ): number {
   nodeCounter = 0;
   editNodes(
@@ -166,5 +178,17 @@ export function editSave(
     iconsLie
   );
   save.ascensionData.currentRun.eyeState = 3;
+  if (boons.length > 0) {
+    save.ascensionData.currentRun.playerDeck.boonIds ??= {
+      $type:
+        "System.Collections.Generic.List`1[[DiskCardGame.BoonData+Type, Assembly-CSharp]], mscorlib",
+      $rlength: 0,
+      $rcontent: [],
+    };
+    save.ascensionData.currentRun.playerDeck.boonIds.$rlength = boons.length;
+    save.ascensionData.currentRun.playerDeck.boonIds.$rcontent = boons.map(
+      (name) => BOONS.findIndex((x) => name == x)
+    );
+  }
   return nodeCounter;
 }
