@@ -2,6 +2,7 @@ import { render } from "preact";
 
 import "@mantine/core/styles.css";
 import {
+  Anchor,
   Box,
   Center,
   DEFAULT_THEME,
@@ -65,6 +66,11 @@ export function App() {
           </Text>
         </Box>
         <Editor />
+        <Text c="violet.6">
+          First 3 players to beat it and post run end screen in{" "}
+          <Anchor href="https://reddit.com/r/inscryption">r/inscryption</Anchor>{" "}
+          will get a permanent memento here!
+        </Text>
       </Stack>
     </MantineProvider>
   );
