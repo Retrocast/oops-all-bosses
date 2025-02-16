@@ -169,7 +169,8 @@ export function editSave(
   save: any,
   bosses: string[],
   iconsLie: boolean,
-  boons: string[]
+  boons: string[],
+  bears: boolean
 ): number {
   nodeCounter = 0;
   editNodes(
@@ -189,6 +190,25 @@ export function editSave(
     save.ascensionData.currentRun.playerDeck.boonIds.$rcontent = boons.map(
       (name) => BOONS.findIndex((x) => name == x)
     );
+  }
+  save.ascensionData.activeChallenges ??= {
+    $type:
+      "System.Collections.Generic.List`1[[DiskCardGame.AscensionChallenge, Assembly-CSharp]], mscorlib",
+    $rlength: 0,
+    $rcontent: [],
+  };
+  if (bears) {
+    if (!save.ascensionData.activeChallenges.$rcontent.includes(13)) {
+      save.ascensionData.activeChallenges.$rcontent.push(13);
+      save.ascensionData.activeChallenges.$rlength++;
+    }
+  } else {
+    if (save.ascensionData.activeChallenges.$rcontent.includes(13)) {
+      save.ascensionData.activeChallenges.$rcontent.splice(
+        save.ascensionData.activeChallenges.$rcontent.findIndex((x) => x == 13)
+      );
+      save.ascensionData.activeChallenges.$rlength--;
+    }
   }
   return nodeCounter;
 }

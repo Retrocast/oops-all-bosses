@@ -4,6 +4,7 @@ import {
   Checkbox,
   FileButton,
   MultiSelect,
+  Stack,
   Text,
   Textarea,
 } from "@mantine/core";
@@ -22,6 +23,7 @@ export function Editor() {
   ]);
   let [iconsLie, setIconsLie] = useState(false);
   let [boons, setBoons] = useState([]);
+  let [bears, setBears] = useState<boolean>();
   let resetRef = useRef<() => void>();
   return (
     <>
@@ -66,6 +68,9 @@ export function Editor() {
             } else {
               setBoons([]);
             }
+            setBears(
+              !!_save.ascensionData?.activeChallenges?.$rcontent?.includes?.(13)
+            );
           } catch (e) {
             console.error(e);
             setError(e);
@@ -116,36 +121,45 @@ export function Editor() {
       {save && (
         <>
           <Text>{status}</Text>
-          <MultiSelect
-            variant="unstyled"
-            label="Bosses to generate"
-            value={bosses}
-            onChange={(x) => x.length > 0 && setBosses(x)}
-            data={["The Prospector", "The Angler", "The Trapper"]}
-          />
-          <Checkbox
-            variant="outline"
-            label="Icons lie!"
-            description="Map icons may not match actual boss on node"
-            checked={iconsLie}
-            onChange={(e) => setIconsLie(e.currentTarget.checked)}
-          />
-          <MultiSelect
-            variant="unstyled"
-            label="Boons"
-            description="There's no way you're beating it without boons"
-            placeholder={boons.length > 0 ? null : "No boons at all?"}
-            value={boons}
-            onChange={setBoons}
-            data={[
-              "Ambidextrous",
-              "Magpie's Eye",
-              "Starting Goat",
-              "Starting Trees",
-              "+8 bones",
-              "+1 bones",
-            ]}
-          />
+          <Stack>
+            <MultiSelect
+              variant="unstyled"
+              label="Bosses to generate"
+              value={bosses}
+              onChange={(x) => x.length > 0 && setBosses(x)}
+              data={["The Prospector", "The Angler", "The Trapper"]}
+            />
+            <Checkbox
+              variant="outline"
+              label="Icons lie!"
+              description="Map icons may not match actual boss on node"
+              checked={iconsLie}
+              onChange={(e) => setIconsLie(e.currentTarget.checked)}
+            />
+            <Checkbox
+              variant="outline"
+              label="EIGHT FUCKING BEARS"
+              description="You know them, you love them"
+              checked={bears}
+              onChange={(e) => setBears(e.currentTarget.checked)}
+            />
+            <MultiSelect
+              variant="unstyled"
+              label="Boons"
+              description="There's no way you're beating it without boons"
+              placeholder={boons.length > 0 ? null : "No boons at all?"}
+              value={boons}
+              onChange={setBoons}
+              data={[
+                "Ambidextrous",
+                "Magpie's Eye",
+                "Starting Goat",
+                "Starting Trees",
+                "+8 bones",
+                "+1 bones",
+              ]}
+            />
+          </Stack>
           <Button
             rightSection={<IconDownload size={14} />}
             variant="light"
@@ -153,7 +167,7 @@ export function Editor() {
               let link = document.createElement("a");
               link.download = "SaveFile.gwsave";
               try {
-                editSave(save, bosses, iconsLie, boons);
+                editSave(save, bosses, iconsLie, boons, bears);
                 link.href = URL.createObjectURL(new Blob([saveSave(save)]));
                 link.click();
               } catch (e) {
