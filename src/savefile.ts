@@ -112,7 +112,12 @@ export const BOONS = [
   "+1 bones",
 ];
 
-function editNodes(nodes: any[], bosses: string[], iconsLie: boolean) {
+function editNodes(
+  nodes: any[],
+  bosses: string[],
+  iconsLie: boolean,
+  finalBoss?: [string, number]
+) {
   nodes.forEach((rootNode) =>
     crawlNode(rootNode, (node) => {
       node.$type = "1337|DiskCardGame.BossBattleNodeData, Assembly-CSharp";
@@ -121,6 +126,13 @@ function editNodes(nodes: any[], bosses: string[], iconsLie: boolean) {
       node.specialBattleId = id;
       node.bossType = iconsLie ? randomChoice([3, 4, 6]) : type;
       node.blueprint = null;
+      if (
+        finalBoss &&
+        (!node.connectedNodes || node.connectedNodes.$rcontent.length == 0)
+      ) {
+        node.specialBattleId = finalBoss[0];
+        node.bossType = finalBoss[1];
+      }
     })
   );
 }
@@ -170,13 +182,20 @@ export function editSave(
   bosses: string[],
   iconsLie: boolean,
   boons: string[],
-  bears: boolean
+  bears: boolean,
+  threeLives: boolean,
+  shortMap: boolean
 ): number {
   nodeCounter = 0;
+  let finalBoss: [string, number] =
+    !!save.ascensionData?.activeChallenges?.$rcontent?.includes?.(15)
+      ? ["PirateSkullBattleSequencer", 20]
+      : ["LeshyBattleSequencer", 7];
   editNodes(
     save.ascensionData.currentRun.map.nodeData.$rcontent,
     bosses,
-    iconsLie
+    iconsLie,
+    shortMap ? finalBoss : null
   );
   save.ascensionData.currentRun.eyeState = 3;
   if (boons.length > 0) {
@@ -210,5 +229,7 @@ export function editSave(
       save.ascensionData.activeChallenges.$rlength--;
     }
   }
+  save.ascensionData.currentRun.maxPlayerLives =
+    save.ascensionData.currentRun.playerLives = threeLives ? 3 : 2;
   return nodeCounter;
 }
