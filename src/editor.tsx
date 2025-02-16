@@ -1,42 +1,62 @@
-import { Anchor, Button, FileButton, Text, Textarea } from "@mantine/core";
+import {
+  Anchor,
+  Button,
+  Checkbox,
+  FileButton,
+  MultiSelect,
+  Text,
+  Textarea,
+} from "@mantine/core";
 import { IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRef, useState } from "preact/hooks";
 import { loadSave, editSave, saveSave, checkSave } from "./savefile";
 
 export function Editor() {
-  let [file, setFile] = useState<File>();
   let [error, setError] = useState<string | Error>();
   let [status, setStatus] = useState<string>();
   let [save, setSave] = useState<any>();
+  let [bosses, setBosses] = useState<string[]>([
+    "The Prospector",
+    "The Angler",
+    "The Trapper",
+  ]);
+  let [iconsLie, setIconsLie] = useState(false);
   let resetRef = useRef<() => void>();
   return (
     <>
       <FileButton
         accept=".gwsave"
         resetRef={resetRef}
-        onChange={async (_file) => {
+        onChange={async (file) => {
           resetRef.current?.();
           try {
-            let bytes = new Uint8Array(await _file.arrayBuffer());
+            let bytes = new Uint8Array(await file.arrayBuffer());
             let _save;
             try {
               _save = loadSave(bytes);
             } catch {
               // Pretty much any error from loadSave can only be caused by giving it data it does not expect.
               // So this message is more helpful for users than something like JSON parse error.
-              return setError(
-                `Failed to load save file! Are you sure ${_file.name} is correct file and it is not corrupt?`
+              setError(
+                `Failed to load save file! Are you sure ${file.name} is correct file and it is not corrupt?`
               );
+              setSave(null);
+              return;
             }
             let [ok, message] = checkSave(_save);
-            if (!ok) return setError(message);
-            setStatus(message);
-            setFile(_file);
+            if (!ok) {
+              setError(message);
+              setSave(null);
+            }
+            setStatus(
+              `${file.name} (${(file.size / 1000).toFixed(1)}KB) - ${message}`
+            );
             setSave(_save);
             setError(null);
           } catch (e) {
             console.error(e);
             setError(e);
+            setSave(null);
           }
         }}
       >
@@ -80,11 +100,23 @@ export function Editor() {
           )}
         </>
       )}
-      {file && (
+      {save && (
         <>
-          <Text>
-            {file.name} - {file.size} bytes ({status})
-          </Text>
+          <Text>{status}</Text>
+          <MultiSelect
+            variant="unstyled"
+            label="Bosses to generate"
+            value={bosses}
+            onChange={(x) => x.length > 0 && setBosses(x)}
+            data={["The Prospector", "The Angler", "The Trapper"]}
+          />
+          <Checkbox
+            variant="outline"
+            label="Icons lie!"
+            description="Map icons may not match actual boss on node"
+            checked={iconsLie}
+            onChange={(e) => setIconsLie(e.currentTarget.checked)}
+          />
           <Button
             rightSection={<IconDownload size={14} />}
             variant="light"
@@ -92,13 +124,14 @@ export function Editor() {
               let link = document.createElement("a");
               link.download = "SaveFile.gwsave";
               try {
-                editSave(save);
+                editSave(save, bosses, iconsLie);
                 link.href = URL.createObjectURL(new Blob([saveSave(save)]));
                 link.click();
               } catch (e) {
                 console.error(e);
                 setError(e);
               }
+              setSave(null);
             }}
           >
             Download save file

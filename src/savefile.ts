@@ -1,5 +1,8 @@
 // Taken from https://github.com/jlcrochet/inscryption_save_editor
 // Check out this awesome project, you'll need a save editor anyway.
+
+import { randomChoice } from "./utils";
+
 // There's no way anyone's beating this legit.
 function normalizeJSON(bytes: Uint8Array): Uint8Array {
   let output: number[] = [];
@@ -92,18 +95,20 @@ function crawlNode(node: any, callback?: (node: any) => void) {
   }
 }
 
-function editNodes(nodes: any[]) {
+const BOSSES = {
+  "The Prospector": ["ProspectorBattleSequencer", 3],
+  "The Angler": ["AnglerBattleSequencer", 4],
+  "The Trapper": ["TrapperTraderBattleSequencer", 6],
+};
+
+function editNodes(nodes: any[], bosses: string[], iconsLie: boolean) {
   nodes.forEach((rootNode) =>
     crawlNode(rootNode, (node) => {
       node.$type = "1337|DiskCardGame.BossBattleNodeData, Assembly-CSharp";
       node.difficulty = 15;
-      let [id, type] = [
-        ["ProspectorBattleSequencer", 3],
-        ["AnglerBattleSequencer", 4],
-        ["TrapperTraderBattleSequencer", 6],
-      ][Math.floor(Math.random() * 3)];
+      let [id, type] = BOSSES[randomChoice(bosses)];
       node.specialBattleId = id;
-      node.bossType = type;
+      node.bossType = iconsLie ? randomChoice([3, 4, 6]) : type;
       node.blueprint = null;
     })
   );
@@ -134,7 +139,9 @@ export function checkSave(save: any): [boolean, string] {
   )
     return [false, "Failed to get node data! Are you sure save isn't corrupt?"];
   nodeCounter = 0;
-  save.ascensionData.currentRun.map.nodeData.$rcontent.forEach(crawlNode);
+  save.ascensionData.currentRun.map.nodeData.$rcontent.forEach((node) =>
+    crawlNode(node)
+  );
   if (nodeCounter == 0)
     return [false, "No node data found! Are you sure save isn't corrupt?"];
   return [
@@ -147,8 +154,17 @@ export function checkSave(save: any): [boolean, string] {
   ];
 }
 
-export function editSave(save: any): number {
+export function editSave(
+  save: any,
+  bosses: string[],
+  iconsLie: boolean
+): number {
   nodeCounter = 0;
-  editNodes(save.ascensionData.currentRun.map.nodeData.$rcontent);
+  editNodes(
+    save.ascensionData.currentRun.map.nodeData.$rcontent,
+    bosses,
+    iconsLie
+  );
+  save.ascensionData.currentRun.eyeState = 3;
   return nodeCounter;
 }
