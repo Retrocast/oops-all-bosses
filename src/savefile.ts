@@ -116,10 +116,12 @@ function editNodes(
   nodes: any[],
   bosses: string[],
   iconsLie: boolean,
-  finalBoss?: [string, number]
+  finalBoss: [string, number] | null,
+  onlyBattles: boolean
 ) {
   nodes.forEach((rootNode) =>
     crawlNode(rootNode, (node) => {
+      if (onlyBattles && typeof node.difficulty == "undefined") return;
       node.$type = "1337|DiskCardGame.BossBattleNodeData, Assembly-CSharp";
       node.difficulty = 15;
       let [id, type] = BOSSES[randomChoice(bosses)];
@@ -184,7 +186,8 @@ export function editSave(
   boons: string[],
   bears: boolean,
   threeLives: boolean,
-  shortMap: boolean
+  shortMap: boolean,
+  onlyBattles: boolean
 ): number {
   nodeCounter = 0;
   let finalBoss: [string, number] =
@@ -195,7 +198,8 @@ export function editSave(
     save.ascensionData.currentRun.map.nodeData.$rcontent,
     bosses,
     iconsLie,
-    shortMap ? finalBoss : null
+    shortMap ? finalBoss : null,
+    onlyBattles
   );
   save.ascensionData.currentRun.eyeState = 3;
   if (boons.length > 0) {

@@ -28,6 +28,7 @@ export function Editor() {
   let [bears, setBears] = useState<boolean>();
   let [threeLives, setThreeLives] = useState<boolean>();
   let [shortMap, setShortMap] = useState<boolean>(true);
+  let [onlyBattles, setOnlyBattles] = useState<boolean>(false);
   let resetRef = useRef<() => void>();
   return (
     <>
@@ -189,6 +190,20 @@ export function Editor() {
                 checked={shortMap}
                 onChange={(e) => setShortMap(e.currentTarget.checked)}
               />
+              <Checkbox
+                variant="outline"
+                label="Only battles"
+                description={
+                  <>
+                    Only card battle nodes will be replaced.
+                    <br />
+                    Utility nodes such as Card Choice or Campfire remain on the
+                    map.
+                  </>
+                }
+                checked={onlyBattles}
+                onChange={(e) => setOnlyBattles(e.currentTarget.checked)}
+              />
             </Stack>
           </Group>
           <Button
@@ -205,7 +220,8 @@ export function Editor() {
                   boons,
                   bears,
                   threeLives,
-                  shortMap
+                  shortMap,
+                  onlyBattles
                 );
                 link.href = URL.createObjectURL(new Blob([saveSave(save)]));
                 link.click();
