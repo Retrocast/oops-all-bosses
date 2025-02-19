@@ -54,10 +54,13 @@ export function App() {
           </Text>
           <Text>3. Close the game and upload your save file here</Text>
           <Text>
-            4. Downloaded edited save file and put it in place of old one
+            4. Adjust challenge settings, or keep them on default values
           </Text>
-          <Text>5. Restart the game</Text>
-          <Text c="red.7">6. Try not to die!</Text>
+          <Text>
+            5. Downloaded edited save file and put it in place of old one
+          </Text>
+          <Text>6. Restart the game and continue the run</Text>
+          <Text c="red.7">7. Try not to die!</Text>
           <Text c="gray.5">
             Note: each time you finish a map section, you'll need to complete
             first node on new map and re-upload your save!
