@@ -2,9 +2,7 @@ import { render } from "preact";
 
 import "@mantine/core/styles.css";
 import {
-  Anchor,
   Box,
-  Center,
   DEFAULT_THEME,
   Divider,
   Group,
@@ -67,9 +65,11 @@ export function App() {
         </Box>
         <Editor />
         <Text c="violet.6">
-          First 3 players to beat it and post run end screen in{" "}
-          <Anchor href="https://reddit.com/r/inscryption">r/inscryption</Anchor>{" "}
-          will get a permanent memento here!
+          First 3 players to beat it and send run end screen to me on Discord{" "}
+          <Text span c="red.7">
+            @retrcast
+          </Text>{" "}
+          will get a permanent memento on this website!
         </Text>
       </Stack>
     </MantineProvider>

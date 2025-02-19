@@ -1,5 +1,4 @@
 import {
-  Anchor,
   Button,
   Checkbox,
   Divider,
@@ -116,11 +115,7 @@ export function Editor() {
               <Text span c="red">
                 @retrcast
               </Text>{" "}
-              on Discord or{" "}
-              <Anchor href="https://www.reddit.com/user/Comfortable-Roll-490/">
-                u/Comfortable-Roll-490/
-              </Anchor>{" "}
-              on Reddit
+              on Discord
             </Text>
           )}
         </>
